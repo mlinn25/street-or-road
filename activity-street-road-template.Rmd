@@ -1,17 +1,24 @@
 ---
-title: "Activity: Street or Road?"
-author: "YOUR NAME HERE"
-output: html_notebook
+title: 'Activity: Street or Road?'
+author: "Maggie Linn"
+output:
+  html_document:
+    df_print: paged
 ---
 
 ## Load in the data
 
 ```{r}
 #load libraries 
-
+library(mosaic)
+library(tidyverse)
+library(lubridate)
+library(dplyr)
+library(dcData)
 #load in the data here 
 # we will only be using the "street-addresses.csv" file from the text
 
+Addresses <- read_csv("https://mdbeckman.github.io/dcSupplement/data/street-addresses.csv")
 
 
 ```
@@ -19,25 +26,61 @@ output: html_notebook
 ## Recreate Solved Example using `sample(50)`
 
 ```{r}
-
-
+Sample <- 
+  Addresses %>%
+  sample_n(size = 50)
+Matches1 <- 
+  Sample %>%
+  filter(grepl(pattern = "PO", address))
+Dont1 <- 
+  Sample %>%
+  filter( !grepl(pattern = "PO", address))
+pattern <- "BOX\\s+(\\d+)"
+Matches2 <- 
+  Sample %>% 
+  filter(grepl(pattern, address))
+Dont2 <-
+  Sample %>%
+  filter( !grepl(pattern, address))
+BoxNumbers1 <- 
+  Sample %>%
+  filter(grepl(pattern, address)) %>%
+  tidyr::extract(address, into = "boxnum", regex = pattern)
 ```
 
 ## Recreate Soved Example using the entire `Address` data set
 
 ```{r}
-
+Matches3 <- 
+  Addresses %>%
+  filter(grepl(pattern = "PO", address))
+Dont3 <- 
+  Addresses %>%
+  filter( !grepl(pattern = "PO", address))
+pattern <- "BOX\\s+(\\d+)"
+Matches4 <- 
+  Addresses %>% 
+  filter(grepl(pattern, address))
+Dont4 <-
+  Addresses %>%
+  filter( !grepl(pattern, address))
+BoxNumbers2 <- 
+  Addresses %>%
+  filter(grepl(pattern, address)) %>%
+  tidyr::extract(address, into = "boxnum", regex = pattern)
 
 ```
 
 #### Additional Question: How many addresses are a PO BOX (including NCSU BOX)? 
 
 ```{r}
-
+Addresses %>%
+  filter( !grepl(pattern = "PO", address)) %>%
+  summarise(count = n())
 
 ```
 
-My answer here...... 
+My answer here...... 7136 addresses.
 
 
 ## Back to the Streets: Your Turn
@@ -52,19 +95,28 @@ LeftOvers <-
           !grepl("\\sAPT|UNIT\\s[\\d]+$", address),
           !grepl(" BOX ", address)
           )
+LeftOvers
 ```
 
 My answer here.......
+The first line of code is the pattern that we want to extract from the data, so ST, RD, or ROAD in an address. The second line of code is assigning the variable to LeftOvers. The third line of code is the data we are using for this code, Addresses. The fourth line of code is filtering the data and looking for the pattern we want to, so looking for addresses without ST, RD, or ROAD in the name of the address.
 
 #### Part 2: Implement your method on the entire `Addresses` data set. Explain how your code works line by line.
 
 ```{r}
 
-
-
+pattern <- "(LN|AVE|WAY)"
+LeftOvers <-
+  Addresses %>% 
+  filter( !grepl(pattern, address),
+          !grepl("\\sAPT|UNIT\\s[\\d]+$", address),
+          !grepl(" BOX ", address)
+          )
+LeftOvers
 ```
 
 My answer here.......
+The first line of code is the pattern that we want to extract from the data, so LN, AVE, or WAY in an address. The second line of code is assigning the variable to LeftOvers. The third line of code is the data we are using for this code, Addresses. The fourth line of code is filtering the data and looking for the pattern we want to, so looking for addresses without LN, AVE, or WAY in the name of the address.
 
 #### Additional Question 1: Present your result from part 2 by providing a table in descending order of popularity for the street name endings you found
 
